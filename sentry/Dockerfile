@@ -6,9 +6,9 @@ WORKDIR /home/sentry
 
 # Sentry dependencies
 RUN pip install \
+    # SQL
     psycopg2 \
     mysql-python \
-    supervisor \
     # Slack integration
     https://github.com/getsentry/sentry-slack/archive/master.zip \
     # Memcached
