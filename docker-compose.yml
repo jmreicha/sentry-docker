@@ -1,0 +1,82 @@
+# Caching
+redis:
+    image: redis:2.8
+    hostname: redis
+    ports:
+        - "6379:6379"
+    volumes:
+        - "/data/redis:/data"
+
+memcached:
+    image: memcached
+    hostname: memcached
+    ports:
+        - "11211:11211"
+
+# Database
+postgres:
+    image: postgres:9.4
+    hostname: postgres
+    ports:
+        - "5432:5432"
+    volumes:
+        - "/data/postgres/etc:/etc/postgresql"
+        - "/data/postgres/log:/var/log/postgresql"
+        - "/data/postgres/lib/data:/var/lib/postgresql/data"
+
+# Customized Sentry configuration
+sentry:
+    build: ./sentry
+    hostname: sentry
+    ports:
+        - "9000:9000"
+        - "9001:9001"
+    links:
+        - postgres
+        - redis
+        - celery
+        - memcached
+    volumes:
+        - "./sentry/sentry.conf.py:/home/sentry/.sentry/sentry.conf.py"
+
+
+# Celery
+celery:
+    build: ./sentry
+    hostname: celery
+    environment:
+        - C_FORCE_ROOT=true
+    command: "sentry celery worker -B -l WARNING"
+    links:
+        - postgres
+        - redis
+        - memcached
+    volumes:
+        - "./sentry/sentry.conf.py:/home/sentry/.sentry/sentry.conf.py"
+
+# Celerybeat
+celerybeat:
+    build: ./sentry
+    hostname: celerybeat
+    environment:
+        - C_FORCE_ROOT=true
+    command: "sentry celery beat -l WARNING"
+    links:
+        - postgres
+        - redis
+    volumes:
+        - "./sentry/sentry.conf.py:/home/sentry/.sentry/sentry.conf.py"
+
+# Nginx
+nginx:
+    image: nginx
+    hostname: nginx
+    ports:
+        - "80:80"
+        - "443:443"
+    links:
+        - sentry
+    volumes:
+        - "./nginx/sentry.conf:/etc/nginx/conf.d/default.conf"
+        - "./nginx/sentry.crt:/etc/nginx/ssl/sentry.crt"
+        - "./nginx/sentry.key:/etc/nginx/ssl/sentry.key"
