@@ -145,8 +145,8 @@ SENTRY_FILESTORE_OPTIONS = {
 # Web Server #
 ##############
 
-# Chane this to match your DNS name
-#SENTRY_URL_PREFIX = 'https://sentry.domain.com'
+# Change this to match your DNS name
+SENTRY_URL_PREFIX = 'https://sentry.example.com'
 
 # If you're using a reverse proxy, you should enable the X-Forwarded-Proto
 # and X-Forwarded-Host headers, and uncomment the following settings
