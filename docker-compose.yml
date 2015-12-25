@@ -5,6 +5,7 @@ redis:
     ports:
         - "6379:6379"
     volumes:
+        # This gets created in the docker-machine VM on OS X
         - "/data/redis:/data"
 
 memcached:
@@ -20,11 +21,12 @@ postgres:
     ports:
         - "5432:5432"
     volumes:
+        # These get created in the docker-machine VM on OS X
         - "/data/postgres/etc:/etc/postgresql"
         - "/data/postgres/log:/var/log/postgresql"
         - "/data/postgres/lib/data:/var/lib/postgresql/data"
 
-# Customized Sentry configuration
+# Sentry
 sentry:
     build: ./sentry
     hostname: sentry
@@ -37,6 +39,7 @@ sentry:
         - celery
         - memcached
     volumes:
+        # Custom Sentry configuration
         - "./sentry/sentry.conf.py:/home/sentry/.sentry/sentry.conf.py"
 
 
@@ -77,6 +80,7 @@ nginx:
     links:
         - sentry
     volumes:
+        # Nginx configuration and certificates
         - "./nginx/sentry.conf:/etc/nginx/conf.d/default.conf"
         - "./nginx/sentry.crt:/etc/nginx/ssl/sentry.crt"
         - "./nginx/sentry.key:/etc/nginx/ssl/sentry.key"
